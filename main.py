@@ -29,6 +29,10 @@ def resolve_output_path():
 
 
 def main():
+    if not ENTRY_TEXT:
+        raise ValueError("entry text must not be empty")
+    if len(ENTRY_TEXT) > 200:
+        raise ValueError("entry text exceeds 200 characters")
     path = resolve_output_path()
     directory = os.path.dirname(path)
     if directory:
@@ -36,6 +40,10 @@ def main():
     with open(path, "w", encoding="utf-8", newline="") as handle:
         handle.write(ENTRY_TEXT)
     os.chmod(path, 0o644)
+    # Read-back check: the written file must match the intended text.
+    with open(path, "r", encoding="utf-8", newline="") as handle:
+        if handle.read() != ENTRY_TEXT:
+            raise ValueError("written entry text does not match intended text")
 
 
 if __name__ == "__main__":
